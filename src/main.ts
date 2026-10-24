@@ -1,6 +1,7 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ensureNotificationPermission, notifyPhaseFinished, playChime } from "./alerts";
 import { hideBreakOverlay, onSkipBreakRequested, showBreakOverlay } from "./overlay";
+import { onTrayAction, scheduleWake, setCloseToTray, setTrayStatus } from "./tray";
 import { type FocusRecord, loadHistory, saveHistory } from "./stats";
 import { renderStats } from "./stats-view";
 import { DEFAULT_SETTINGS, type Settings, loadSettings, sanitizeSettings, saveSettings } from "./settings";
@@ -70,6 +71,17 @@ function render(now = Date.now()) {
   taskInput.disabled = state.running && state.phase === "focus";
 
   setTitle(state.running ? `${formatClock(left)} · ${PHASE_LABEL[state.phase]}` : "Focus");
+  setTrayStatus(state.running ? formatClock(left) : null, state.running ? PHASE_LABEL[state.phase] : "Focus");
+  syncWake();
+}
+
+let wakeAt: number | null = null;
+/** Keep the backend's wake-up in step with the running phase's end. */
+function syncWake() {
+  const next = state.running ? state.endsAt : null;
+  if (next === wakeAt) return;
+  wakeAt = next;
+  scheduleWake(next);
 }
 
 function loop() {
@@ -182,8 +194,15 @@ settingsDialog.addEventListener("close", () => {
   state = applyConfig(state, settings, next);
   settings = next;
   saveSettings(settings);
+  setCloseToTray(settings.closeToTray);
   if (settings.notifications) void ensureNotificationPermission();
   render();
+});
+
+onTrayAction({
+  toggle: () => toggleBtn.click(),
+  skip: () => skipBtn.click(),
+  wake: loop,
 });
 
 // Space toggles the timer unless the user is typing or a dialog is open.
@@ -194,5 +213,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+setCloseToTray(settings.closeToTray);
 render();
 setInterval(loop, 250);

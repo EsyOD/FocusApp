@@ -6,6 +6,9 @@
   "permissions": [
     "core:default", "core:window:allow-set-title", "notification:default",
     "core:webview:allow-create-webview-window",
-    "core:window:allow-destroy"
+    "core:window:allow-destroy",
+    "core:tray:allow-get-by-id",
+    "core:tray:allow-set-title",
+    "core:tray:allow-set-tooltip"
   ]
 }
