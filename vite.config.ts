@@ -10,5 +10,9 @@ export default defineConfig({
   build: {
     target: "es2022",
     outDir: "dist",
+    rollupOptions: {
+      // The break overlay windows load their own page.
+      input: { main: "index.html", overlay: "overlay.html" },
+    },
   },
 });

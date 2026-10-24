@@ -8,11 +8,15 @@ describe("settings", () => {
   });
 
   it("keeps valid values", () => {
-    expect(sanitizeSettings({ focusMinutes: 45, sound: false, notifications: false })).toEqual({
+    expect(
+      sanitizeSettings({ focusMinutes: 45, sound: false, notifications: false, breakOverlay: false, allowSkipBreak: false }),
+    ).toEqual({
       ...DEFAULT_SETTINGS,
       focusMinutes: 45,
       sound: false,
       notifications: false,
+      breakOverlay: false,
+      allowSkipBreak: false,
     });
   });
 });
