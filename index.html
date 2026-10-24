@@ -8,6 +8,13 @@
   </head>
   <body>
     <main class="app" data-phase="focus">
+      <button id="open-settings" class="icon-button" title="设置" aria-label="设置">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+        </svg>
+      </button>
+
       <nav class="phases" aria-label="阶段">
         <span data-tab="focus">专注</span>
         <span data-tab="shortBreak">短休息</span>
@@ -36,6 +43,30 @@
         <button id="skip" class="secondary" title="跳到下一阶段">跳过</button>
       </div>
     </main>
+
+    <dialog id="settings" class="settings">
+      <form method="dialog">
+        <h2>设置</h2>
+        <fieldset>
+          <legend>时长（分钟）</legend>
+          <label>专注<input name="focusMinutes" type="number" min="1" max="180" required /></label>
+          <label>短休息<input name="shortBreakMinutes" type="number" min="1" max="60" required /></label>
+          <label>长休息<input name="longBreakMinutes" type="number" min="1" max="120" required /></label>
+          <label>每几个番茄一次长休息<input name="longBreakEvery" type="number" min="1" max="12" required /></label>
+        </fieldset>
+        <fieldset>
+          <legend>提醒</legend>
+          <label class="toggle">系统通知<input name="notifications" type="checkbox" /></label>
+          <label class="toggle">提示音<input name="sound" type="checkbox" /></label>
+        </fieldset>
+        <p class="hint">正在进行的阶段会保持原来的时长，新时长从下一阶段开始生效。</p>
+        <div class="dialog-actions">
+          <button type="button" id="restore-defaults" class="secondary">恢复默认</button>
+          <button value="cancel" formnovalidate class="secondary">取消</button>
+          <button value="save" class="primary">保存</button>
+        </div>
+      </form>
+    </dialog>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

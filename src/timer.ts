@@ -56,6 +56,36 @@ export function initialState(config: TimerConfig): TimerState {
   };
 }
 
+const LIMITS: Record<keyof TimerConfig, [min: number, max: number]> = {
+  focusMinutes: [1, 180],
+  shortBreakMinutes: [1, 60],
+  longBreakMinutes: [1, 120],
+  longBreakEvery: [1, 12],
+};
+
+/** Coerce untrusted input (form fields, stored JSON) into a valid config. */
+export function sanitizeConfig(input: Partial<Record<keyof TimerConfig, unknown>>): TimerConfig {
+  const out = { ...DEFAULT_CONFIG };
+  for (const key of Object.keys(LIMITS) as (keyof TimerConfig)[]) {
+    const n = Math.round(Number(input[key]));
+    if (Number.isFinite(n)) {
+      const [min, max] = LIMITS[key];
+      out[key] = Math.min(max, Math.max(min, n));
+    }
+  }
+  return out;
+}
+
+/**
+ * Apply new durations. A phase that hasn't been started yet picks up the new
+ * length right away; one already in progress keeps its own countdown and the
+ * change takes effect from the next phase.
+ */
+export function applyConfig(state: TimerState, prev: TimerConfig, next: TimerConfig): TimerState {
+  const untouched = !state.running && state.remainingMs === phaseDurationMs(state.phase, prev);
+  return untouched ? { ...state, remainingMs: phaseDurationMs(state.phase, next) } : state;
+}
+
 export function remainingMs(state: TimerState, now: number): number {
   if (!state.running || state.endsAt === null) return state.remainingMs;
   return Math.max(0, state.endsAt - now);

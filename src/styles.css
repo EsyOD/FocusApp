@@ -7,6 +7,8 @@
   --focus: #d9534f;
   --break: #3f9f7f;
   --long-break: #3b7dc4;
+  /* Overridden per phase on .app; the default covers dialogs outside it. */
+  --accent: var(--focus);
   color-scheme: light dark;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
@@ -178,4 +180,117 @@ button.secondary {
 
 button:hover {
   filter: brightness(1.05);
+}
+
+.app {
+  position: relative;
+}
+
+.icon-button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+}
+
+.icon-button:hover {
+  background: var(--track);
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.settings {
+  width: min(360px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 20px;
+  border: none;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.25);
+}
+
+.settings::backdrop {
+  background: rgb(0 0 0 / 0.35);
+}
+
+.settings h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.settings fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 14px;
+  padding: 0;
+  border: none;
+}
+
+.settings legend {
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.settings label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.settings input[type="number"] {
+  width: 72px;
+  padding: 6px 8px;
+  border: 1px solid var(--track);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  text-align: right;
+}
+
+.settings input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--focus);
+}
+
+.settings .hint {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dialog-actions button {
+  min-width: 0;
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.dialog-actions #restore-defaults {
+  margin-right: auto;
 }
