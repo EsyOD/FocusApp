@@ -1,6 +1,8 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ensureNotificationPermission, notifyPhaseFinished, playChime } from "./alerts";
 import { hideBreakOverlay, onSkipBreakRequested, showBreakOverlay } from "./overlay";
+import { type FocusRecord, loadHistory, saveHistory } from "./stats";
+import { renderStats } from "./stats-view";
 import { DEFAULT_SETTINGS, type Settings, loadSettings, sanitizeSettings, saveSettings } from "./settings";
 import {
   type Phase,
@@ -29,6 +31,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 90;
 let settings: Settings = loadSettings();
 let state: TimerState = initialState(settings);
 let overlayShown = false;
+const focusHistory: FocusRecord[] = loadHistory();
 
 const app = document.querySelector<HTMLElement>(".app")!;
 const clock = document.getElementById("clock")!;
@@ -75,6 +78,10 @@ function loop() {
   state = result.state;
   if (result.finished) {
     const task = taskInput.value.trim();
+    if (result.finished.phase === "focus") {
+      focusHistory.push({ endedAt: now, minutes: settings.focusMinutes, task });
+      saveHistory(focusHistory);
+    }
     if (settings.sound) playChime(result.finished.phase === "focus");
     if (settings.notifications) void notifyPhaseFinished(result.finished, task);
     if (result.finished.phase === "focus" && settings.breakOverlay) {
@@ -88,7 +95,6 @@ function loop() {
         task,
       });
     }
-    // Step 4 hooks in here: stats record.
   }
   syncOverlay();
   render(now);
@@ -135,6 +141,12 @@ skipBtn.addEventListener("click", () => {
   render();
 });
 
+const statsDialog = document.getElementById("stats") as HTMLDialogElement;
+document.getElementById("open-stats")!.addEventListener("click", () => {
+  renderStats(focusHistory);
+  statsDialog.showModal();
+});
+
 const settingsDialog = document.getElementById("settings") as HTMLDialogElement;
 const settingsForm = settingsDialog.querySelector("form")!;
 
@@ -176,7 +188,7 @@ settingsDialog.addEventListener("close", () => {
 
 // Space toggles the timer unless the user is typing or a dialog is open.
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space" && document.activeElement !== taskInput && !settingsDialog.open) {
+  if (e.code === "Space" && document.activeElement !== taskInput && !settingsDialog.open && !statsDialog.open) {
     e.preventDefault();
     toggleBtn.click();
   }
