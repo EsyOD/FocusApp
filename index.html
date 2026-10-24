@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <main class="app" data-phase="focus">
+      <nav class="phases" aria-label="阶段">
+        <span data-tab="focus">专注</span>
+        <span data-tab="shortBreak">短休息</span>
+        <span data-tab="longBreak">长休息</span>
+      </nav>
+
+      <div class="dial">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="track" cx="100" cy="100" r="90" />
+          <circle class="progress" cx="100" cy="100" r="90" />
+        </svg>
+        <div class="readout">
+          <div id="clock" class="clock">25:00</div>
+          <div id="round" class="round">第 1 个番茄</div>
+        </div>
+      </div>
+
+      <label class="task">
+        <span>这一轮专注在</span>
+        <input id="task" type="text" maxlength="80" placeholder="写下一件事，比如：写完周报" autocomplete="off" />
+      </label>
+
+      <div class="controls">
+        <button id="reset" class="secondary" title="重置当前阶段">重置</button>
+        <button id="toggle" class="primary">开始</button>
+        <button id="skip" class="secondary" title="跳到下一阶段">跳过</button>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
