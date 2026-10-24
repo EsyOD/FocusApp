@@ -7,9 +7,11 @@ export interface Settings extends TimerConfig {
   breakOverlay: boolean;
   /** Show a "skip break" button on the overlay for emergencies. */
   allowSkipBreak: boolean;
+  /** Closing the window hides it to the tray instead of quitting. */
+  closeToTray: boolean;
 }
 
-const FLAGS = ["notifications", "sound", "breakOverlay", "allowSkipBreak"] as const;
+const FLAGS = ["notifications", "sound", "breakOverlay", "allowSkipBreak", "closeToTray"] as const;
 
 export const DEFAULT_SETTINGS: Settings = {
   ...DEFAULT_CONFIG,
@@ -17,6 +19,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sound: true,
   breakOverlay: true,
   allowSkipBreak: true,
+  closeToTray: true,
 };
 
 const KEY = "focus.settings.v1";
