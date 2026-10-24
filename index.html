@@ -8,6 +8,14 @@
   </head>
   <body>
     <main class="app" data-phase="focus">
+      <button id="open-stats" class="icon-button left" title="统计" aria-label="统计">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 20h16" />
+          <path d="M7 16v-5" />
+          <path d="M12 16V6" />
+          <path d="M17 16v-8" />
+        </svg>
+      </button>
       <button id="open-settings" class="icon-button" title="设置" aria-label="设置">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
@@ -72,6 +80,29 @@
         </div>
       </form>
     </dialog>
+    <dialog id="stats" class="settings stats">
+      <form method="dialog">
+        <h2>统计</h2>
+        <div class="tiles">
+          <div class="tile"><span class="label">今天</span><strong id="stat-today">0</strong><span id="stat-today-time" class="sub">0 分钟</span></div>
+          <div class="tile"><span class="label">本周</span><strong id="stat-week">0</strong><span id="stat-week-time" class="sub">0 分钟</span></div>
+          <div class="tile"><span class="label">连续专注</span><strong id="stat-streak">0</strong><span class="sub">天</span></div>
+        </div>
+        <section>
+          <h3>最近 7 天完成的番茄</h3>
+          <div id="stat-days" class="bars" role="table" aria-label="最近 7 天每天完成的番茄数"></div>
+        </section>
+        <section>
+          <h3>本周时间花在了</h3>
+          <ul id="stat-tasks" class="task-list"></ul>
+          <p id="stat-empty" class="hint" hidden>完成第一个番茄后，这里会显示你的专注记录。</p>
+        </section>
+        <div class="dialog-actions">
+          <button value="close" class="primary">关闭</button>
+        </div>
+      </form>
+    </dialog>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
