@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_CONFIG,
+  applyConfig,
+  sanitizeConfig,
   formatClock,
   initialState,
   pause,
@@ -64,6 +66,29 @@ describe("timer", () => {
       "shortBreak", "focus", "shortBreak", "focus",
       "shortBreak", "focus", "longBreak", "focus",
     ]);
+  });
+
+  it("sanitizes config input, clamping and falling back to defaults", () => {
+    expect(
+      sanitizeConfig({ focusMinutes: "50", shortBreakMinutes: 0, longBreakMinutes: "abc", longBreakEvery: 99 }),
+    ).toEqual({ focusMinutes: 50, shortBreakMinutes: 1, longBreakMinutes: 15, longBreakEvery: 12 });
+  });
+
+  it("applies new durations to an unstarted phase only", () => {
+    const longer = { ...config, focusMinutes: 50 };
+    expect(applyConfig(initialState(config), config, longer).remainingMs).toBe(50 * MIN);
+
+    const paused = pause(start(initialState(config), 0), 3 * MIN);
+    expect(applyConfig(paused, config, longer).remainingMs).toBe(22 * MIN);
+  });
+
+  it("uses custom durations and long break cadence", () => {
+    const custom = { focusMinutes: 50, shortBreakMinutes: 10, longBreakMinutes: 30, longBreakEvery: 2 };
+    let s = skip(initialState(custom), custom);
+    expect(s.remainingMs).toBe(10 * MIN);
+    s = skip(skip(s, custom), custom);
+    expect(s.phase).toBe("longBreak");
+    expect(s.remainingMs).toBe(30 * MIN);
   });
 
   it("formats the clock as mm:ss, rounding partial seconds up", () => {
