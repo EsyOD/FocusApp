@@ -1,0 +1,73 @@
+:root {
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+}
+
+.overlay {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: radial-gradient(circle at 50% 40%, #2f6f5c, #12271f 70%);
+  color: #eef6f2;
+  text-align: center;
+}
+
+.overlay[data-phase="longBreak"] {
+  background: radial-gradient(circle at 50% 40%, #2d5c8f, #101e2e 70%);
+}
+
+.kicker {
+  margin: 0;
+  font-size: 20px;
+  letter-spacing: 4px;
+  opacity: 0.8;
+}
+
+.clock {
+  font-size: clamp(72px, 16vw, 180px);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.tip {
+  margin: 8px 0 0;
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+.done {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+#skip {
+  position: absolute;
+  bottom: 48px;
+  padding: 10px 22px;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(255 255 255 / 0.75);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#skip:hover {
+  background: rgb(255 255 255 / 0.1);
+}

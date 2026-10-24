@@ -2,6 +2,10 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Permissions for the main window",
-  "windows": ["main"],
-  "permissions": ["core:default", "core:window:allow-set-title", "notification:default"]
+  "windows": ["main", "overlay-*"],
+  "permissions": [
+    "core:default", "core:window:allow-set-title", "notification:default",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-destroy"
+  ]
 }

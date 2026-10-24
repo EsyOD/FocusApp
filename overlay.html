@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus 休息中</title>
+    <link rel="stylesheet" href="/src/overlay.css" />
+  </head>
+  <body>
+    <main class="overlay" data-phase="shortBreak">
+      <p id="kicker" class="kicker">休息一下</p>
+      <div id="clock" class="clock">05:00</div>
+      <p id="tip" class="tip">离开屏幕，站起来走一走。</p>
+      <p id="done" class="done" hidden></p>
+      <button id="skip" hidden>紧急情况，跳过休息</button>
+    </main>
+    <script type="module" src="/src/overlay-page.ts"></script>
+  </body>
+</html>

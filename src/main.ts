@@ -1,5 +1,6 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ensureNotificationPermission, notifyPhaseFinished, playChime } from "./alerts";
+import { hideBreakOverlay, onSkipBreakRequested, showBreakOverlay } from "./overlay";
 import { DEFAULT_SETTINGS, type Settings, loadSettings, sanitizeSettings, saveSettings } from "./settings";
 import {
   type Phase,
@@ -27,6 +28,7 @@ const CIRCUMFERENCE = 2 * Math.PI * 90;
 // Settings is a superset of TimerConfig, so it is passed to the timer as-is.
 let settings: Settings = loadSettings();
 let state: TimerState = initialState(settings);
+let overlayShown = false;
 
 const app = document.querySelector<HTMLElement>(".app")!;
 const clock = document.getElementById("clock")!;
@@ -72,14 +74,46 @@ function loop() {
   const result = tick(state, settings, now);
   state = result.state;
   if (result.finished) {
+    const task = taskInput.value.trim();
     if (settings.sound) playChime(result.finished.phase === "focus");
-    if (settings.notifications) void notifyPhaseFinished(result.finished, taskInput.value.trim());
-    // Steps 3–4 hook in here: break overlay, stats record.
+    if (settings.notifications) void notifyPhaseFinished(result.finished, task);
+    if (result.finished.phase === "focus" && settings.breakOverlay) {
+      // The overlay is the break, so it starts counting right away.
+      state = start(state, now);
+      overlayShown = true;
+      void showBreakOverlay({
+        phase: state.phase,
+        endsAt: state.endsAt!,
+        allowSkip: settings.allowSkipBreak,
+        task,
+      });
+    }
+    // Step 4 hooks in here: stats record.
   }
+  syncOverlay();
   render(now);
 }
 
+/** Close the overlay as soon as the break is over, however it ended. */
+function syncOverlay() {
+  if (overlayShown && !(state.phase !== "focus" && state.running)) {
+    overlayShown = false;
+    void hideBreakOverlay();
+  }
+}
+
+onSkipBreakRequested(() => {
+  if (state.phase === "focus") return;
+  state = skip(state, settings);
+  syncOverlay();
+  render();
+});
+
+// With skipping disabled, the main window's controls mustn't be a back door.
+const breakLocked = () => overlayShown && !settings.allowSkipBreak;
+
 toggleBtn.addEventListener("click", () => {
+  if (breakLocked()) return;
   const now = Date.now();
   state = state.running ? pause(state, now) : start(state, now);
   // Ask on the first user gesture rather than at launch, when it's clear why.
@@ -88,12 +122,16 @@ toggleBtn.addEventListener("click", () => {
 });
 
 resetBtn.addEventListener("click", () => {
+  if (breakLocked()) return;
   state = reset(state, settings);
+  syncOverlay();
   render();
 });
 
 skipBtn.addEventListener("click", () => {
+  if (breakLocked()) return;
   state = skip(state, settings);
+  syncOverlay();
   render();
 });
 
@@ -123,11 +161,12 @@ document.getElementById("restore-defaults")!.addEventListener("click", () => {
 settingsDialog.addEventListener("close", () => {
   if (settingsDialog.returnValue !== "save") return;
   const form = new FormData(settingsForm);
-  const next = sanitizeSettings({
-    ...Object.fromEntries(form),
-    notifications: form.has("notifications"),
-    sound: form.has("sound"),
-  });
+  const values: Record<string, unknown> = Object.fromEntries(form);
+  // Unchecked boxes are absent from FormData, so read every checkbox explicitly.
+  for (const box of settingsForm.querySelectorAll<HTMLInputElement>("input[type=checkbox]")) {
+    values[box.name] = box.checked;
+  }
+  const next = sanitizeSettings(values);
   state = applyConfig(state, settings, next);
   settings = next;
   saveSettings(settings);
